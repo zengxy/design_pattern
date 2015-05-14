@@ -13,6 +13,8 @@
 // o If you map Queue's enque() to Stack's push(), then the pseudocode below
 //   will give you insight into implementing Queue's deque() method.
 
+//git push test
+
 
 #include <iostream>
 using namespace std;
@@ -73,7 +75,7 @@ class Queue {
 		delete pstack;
 		pstack=NULL;
 	}
-
+	//mac test
 	bool isFull()
 	{
 		if( ::isFull(pstack)==1 )
