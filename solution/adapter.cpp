@@ -1,13 +1,13 @@
 // Purpose.  Adapter design pattern lab
-// 
+//
 // Problem.  Simulated here is a "stack machine", or a non-OO
 // implementation of a Stack class.  We would like to reuse this "legacy"
 // asset as the basis for a new Queue class, but there is an "impedance
 // mismatch" between the old and the new.
-// 
+//
 // Assignment.
 // o The class Queue should contain an "instance" of component Stack.
-// o Queue needs a constructor, destructor, enque, deque, and isEmpty methods.  
+// o Queue needs a constructor, destructor, enque, deque, and isEmpty methods.
 //   Each of these methods will provide an adaptation from the Queue interface to the
 //   Stack implementation.
 // o If you map Queue's enque() to Stack's push(), then the pseudocode below
@@ -104,7 +104,7 @@ class Queue {
 	}
 
 	int deque()
-	{  
+	{
 		Stack* ptemp=new Stack;
 		initialize(ptemp,size);
 		while( !::isEmpty(pstack) )
