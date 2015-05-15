@@ -1,5 +1,4 @@
 // Purpose.  Adapter design pattern lab
-//
 // Problem.  Simulated here is a "stack machine", or a non-OO
 // implementation of a Stack class.  We would like to reuse this "legacy"
 // asset as the basis for a new Queue class, but there is an "impedance
