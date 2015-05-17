@@ -1,16 +1,16 @@
 // Purpose.  State design pattern lab
-// 
+//
 // Problem.  A large monolithic case  drives the application.  As
 // the program evolves, this case statemen may have to be duplicated in
 // multiple places.  We want to migrate to an OO design, but we need to be
 // careful not to encapsulate multiple distinct "behaviors" in a single
 // object.
-// 
+//
 // FSM:  Message ==> on    off   ack
 //       State A     A     B     C
 //       State B           A     C
 //       State C                 B
-// 
+//
 // Assignment.
 // o Define an FSM context (wrapper, handle, interface) class
 // o FSM declares a private data member of type FSMstate* to remember its
@@ -18,7 +18,7 @@
 // o FSM defines the member functions on(), off(), and ack().  Each of these
 //   functions delegates to the contained object by calling its member func-
 //   tion of the same name, and passing the FSM's "this" pointer. [GOF, p310,
-//   bottom
+//   bottom]
 // o FSM declares class FSMstate as friend (because FSMstate will be setting
 //   the "current state" member)
 // o Define an FSMstate base class
@@ -43,48 +43,184 @@
 // o FSM's constructor initializes its "current state" member to state "B"
 // o The body of main() reduces to "FSM fsm;" plus a minimal driver loop
 
-#include <iostream.h>
+#include <iostream>
+using namespace std;
 
-enum State   { A, B, C };
-enum Message { on, off, ack };
-State        currentState;
-Message      messageArray[10] = { on,off,off,ack,ack,ack,ack,on,off,off };
+class FSMState
+{
+public:
+    virtual FSMState* on()=0;
+    virtual FSMState* off()=0;
+    virtual FSMState* ack()=0;
+  /*  void setCurrentState(FSMState* state)
+    {
+        currentState=state;
+    }
+    FSMState* gerCurrentState()
+    {
+        return currentState;
+    }
+private:
+    FSMState* currentState;*/
+};
 
-void main( void ) {
-   currentState = B;
-   for (int index=0; index < 10; index++) {
-      if (currentState == A) {
-         if (messageArray[index] == on) {
-            cout << "A, on ==> A" << endl;
-            currentState = A;
-         } else if (messageArray[index] == off) {
-            cout << "A, off ==> B" << endl;
-            currentState = B;
-         } else if (messageArray[index] == ack) {
-            cout << "A, ack ==> C" << endl;
-            currentState = C;
-         }
-      } else if (currentState == B) {
-         if (messageArray[index] == on) {
-            cout << "undefined combo" << endl;
-         } else if (messageArray[index] == off) {
-            cout << "B, off ==> A" << endl;
-            currentState = A;
-         } else if (messageArray[index] == ack) {
-            cout << "B, ack ==> C" << endl;
-            currentState = C;
-         }
-      } else if (currentState == C) {
-         if (messageArray[index] == on) {
-            cout << "undefined combo" << endl;
-         } else if (messageArray[index] == off) {
-            cout << "undefined combo" << endl;
-         } else if (messageArray[index] == ack) {
-            cout << "C, ack ==> B" << endl;
-            currentState = B;
-         }
-      }
-   }
+class A:public FSMState
+{
+private:
+    A(){};
+    static A* pA;
+public:
+    static A* getInstance();
+    FSMState* on();
+    FSMState* off();
+    FSMState* ack();
+};
+A* A::pA=0;
+
+class B:public FSMState
+{
+private:
+    B(){};
+    static B* pB;
+public:
+    static B* getInstance();
+    FSMState* on();
+    FSMState* off();
+    FSMState* ack();
+};
+B* B::pB=0;
+
+class C:public FSMState
+{
+private:
+    C(){};
+    static C* pC;
+public:
+    static C* getInstance();
+    FSMState* on();
+    FSMState* off();
+    FSMState* ack();
+};
+C* C::pC=0;
+
+class FSM
+{
+    FSMState* current;
+public:
+    FSM(FSMState* state)
+    {
+        current=state;
+    }
+
+    void on()
+    {
+        current=current->on();
+    }
+
+    void off()
+    {
+        current=current->off();
+    }
+
+    void ack()
+    {
+        current=current->ack();
+    }
+};
+
+
+
+A* A::getInstance()
+{
+    if(pA==0)
+    {
+        pA=new A();
+    }
+    return pA;
+}
+
+FSMState* A::on()
+{
+    cout<<"A, on  ==> A";
+    return A::getInstance();
+}
+FSMState* A::off()
+{
+    cout<<"A, off ==> B";
+    return B::getInstance();
+
+}
+FSMState* A::ack()
+{
+    cout<<"A, ack ==> C";
+    return C::getInstance();
+}
+
+
+B* B::getInstance()
+{
+    if(pB==0)
+        pB=new B();
+    return pB;
+}
+
+FSMState* B::on()
+{
+    cout<<"undefined combo";
+    return pB;
+}
+FSMState* B::off()
+{
+    cout<<"B, off ==> A";
+    return A::getInstance();
+}
+FSMState* B::ack()
+{
+    cout<<"B, ack ==> C";
+    return C::getInstance();
+}
+
+
+C* C::getInstance()
+{
+    if(pC==NULL)
+        pC=new C();
+    return pC;
+}
+
+FSMState* C::on()
+{
+    cout<<"undefined combo";
+    return pC;
+}
+FSMState* C::off()
+{
+    cout<<"undefined combo";
+    return pC;
+}
+FSMState* C::ack()
+{
+    cout<<"C, ack ==> B";
+    return B::getInstance();
+}
+
+int main()
+{
+    enum Message { on, off, ack };
+    Message messageArray[10] = { on,off,off,ack,ack,ack,ack,on,off,off };
+    FSM* context = new FSM(B::getInstance());
+    for (int index=0; index < 10; index++)
+    {
+        if(messageArray[index] == on)
+            context->on();
+        else if(messageArray[index] == off)
+            context->off();
+        else if(messageArray[index] == ack)
+            context->ack();
+        cout<<endl;
+    }
+
+    return 1;
 }
 
 // undefined combo
